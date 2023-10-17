@@ -3,8 +3,8 @@ import { MongooseID } from "../../../types";
 
 
 export interface IConversation extends Document {
-  participants: Types.Array<Types.ObjectId>;
-  messages: Types.Array<Types.ObjectId>;
+  participants: Types.Array<Types.ObjectId | string>;
+  messages: Types.Array<Types.ObjectId | string>;
   title: string;
   lastUpdate: Date;
   seen: { [userId: string]: string };

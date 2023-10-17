@@ -2,11 +2,11 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 import { MongooseID } from "../../../types";
 
 export interface IMessage extends Document {
-  conversationId: Types.ObjectId;
-  from: Types.ObjectId;
+  conversationId: Types.ObjectId | string;
+  from: Types.ObjectId | string;
   content: string;
   postedAt: Date;
-  replyTo: Types.ObjectId | null;
+  replyTo: Types.ObjectId | null | string;
   edited: boolean;
   deleted: boolean;
   reactions: { [userId: string]: string };
