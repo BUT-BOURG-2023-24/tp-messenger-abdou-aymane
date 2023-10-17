@@ -16,6 +16,7 @@ async function setup(): Promise<SetupResult>
 	let database = new Database(true);
 
 	await database.connect();
+	
 
 	/*
 		On veut supprimer toutes les collections de la base de données de test
