@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 import { MongooseID } from "../../../types";
 
-
 export interface IConversation extends Document {
   participants: Types.Array<Types.ObjectId | string>;
   messages: Types.Array<Types.ObjectId | string>;
@@ -11,18 +10,24 @@ export interface IConversation extends Document {
 }
 
 const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
-  participants: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
-  messages: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Message",
-    },
-  ],
+  participants: {
+    type: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    default: [],
+  },
+  messages: {
+    type: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    default: [],
+  },
   title: {
     type: String,
     required: true,
@@ -31,10 +36,22 @@ const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
     type: Date,
     default: Date.now,
   },
-  seen: {
-    type: Map,
-    of: String,
-  },
+  seen: [
+    {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      messageId: {
+        type: Schema.Types.ObjectId,
+        ref: "Message",
+      },
+      hasSeen: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
 });
 
 const ConversationModel = mongoose.model<IConversation>(
