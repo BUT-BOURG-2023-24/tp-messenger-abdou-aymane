@@ -45,10 +45,17 @@ const MessageSchema: Schema<IMessage> = new Schema<IMessage>({
   },
   reactions: {
     type: Map,
-    of: String,
+    of: {
+      type: String,
+      enum: ["HAPPY", "SAD", "THUMBSUP", "THUMBSDOWN", "LOVE"]
+    },
+    default: {},
   },
 });
 
-const MessageModel = mongoose.model<IMessage>("Message", MessageSchema);
+const MessageModel = mongoose.model<IMessage>(
+  "Message",
+  MessageSchema
+);
 
-export { MessageModel, MessageSchema };
+export default MessageModel;
