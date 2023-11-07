@@ -5,6 +5,8 @@ dotenv.config();
 export default {
 	DB_ADDRESS: process.env.DB_ADDRESS ?? "",
 	DB_ADDRESS_TEST: process.env.DB_ADDRESS_TEST ?? "",
+	SECRET_KEY:  process.env.SECRET_KEY ?? "",
+	TOKEN_EXP:  process.env.TOKEN_EXP ?? "",
 	PORT: process.env.PORT ?? 5000,
 };
 
