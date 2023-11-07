@@ -1,8 +1,12 @@
 import UserModel, { IUser } from "../database/Mongo/Models/UserModel";
 
-async function createUser(username:string,password:string,profilePicId:string) {
+async function createUser(
+  username: string,
+  password: string,
+  profilePicId: string
+) {
   try {
-    const user = new UserModel({username,password,profilePicId});
+    const user = new UserModel({ username, password, profilePicId });
     const savedUser = await user.save();
     return { user: savedUser };
   } catch (error) {
@@ -10,12 +14,12 @@ async function createUser(username:string,password:string,profilePicId:string) {
   }
 }
 
-async function getUserByName(username: string) : Promise<IUser | null>{
+async function getUserByName(username: string): Promise<IUser | null> {
   try {
     const user = await UserModel.findOne({ username });
     return user;
   } catch (error) {
-    return null ;
+    return null;
   }
 }
 
@@ -31,11 +35,19 @@ async function getUserById(id: string) {
 async function getUsersByIds(ids: string[]) {
   try {
     const users = await UserModel.find({ _id: { $in: ids } });
-    return { users };
+    return users;
   } catch (error) {
     return { error };
   }
 }
 
+async function getAllUsers() {
+  try {
+    const users = await UserModel.find();
+    return users;
+  } catch (error) {
+    return null ;
+  }
+}
 
-export { createUser, getUserByName, getUserById, getUsersByIds };
+export { createUser, getUserByName, getUserById, getUsersByIds, getAllUsers };
