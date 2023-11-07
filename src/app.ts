@@ -3,22 +3,32 @@ import express from "express";
 import { Server } from "socket.io";
 import { Database } from "./database/database";
 import { SocketController } from "./socket/socketController";
-
+import UserRouter from "./routers/UserRouter";
+import cors from "cors";
 const app = express();
 
-function makeApp(database: Database) 
-{
-	app.locals.database = database;
+function makeApp(database: Database, auth: any) {
+  app.locals.database = database;
+  database.connect();
+  app.locals.auth = auth;
+  const server = http.createServer(app);
+  app.use(express.json());
+  app.use(
+    cors({
+      credentials: true,
+      origin: "http://localhost:3000",
+    })
+  );
 
-	const server = http.createServer(app);
-	app.use(express.json());
+  const io = new Server(server, { cors: { origin: "*" } });
+  let socketController = new SocketController(io, database);
 
-	const io = new Server(server, { cors: { origin: "*" } });
-	let socketController = new SocketController(io, database);
+ 
+  app.use("/users", UserRouter);
 
-	app.locals.sockerController = socketController;
+  app.locals.sockerController = socketController;
 
-	return { app, server };
+  return { app, server };
 }
 
 export { makeApp };

@@ -5,8 +5,9 @@ import config from "./config";
 let DBInstance = new Database(
 	false
 );
+const auth = require("./auth");
 
-const { app, server } = makeApp(DBInstance);
+const { server } = makeApp(DBInstance,auth);
 
 server.listen(config.PORT, () => {
 	console.log(`Server is listening on http://localhost:${config.PORT}`);
