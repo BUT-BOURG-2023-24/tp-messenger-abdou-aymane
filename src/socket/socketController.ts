@@ -12,8 +12,6 @@ export class SocketController {
   public get SocketIdToUserId(): string[] {
 	return this.socketIdToUserId;
   }
-  
-
 
   connect() {
     this.io.on("connection", (socket: Socket) => {
@@ -23,6 +21,25 @@ export class SocketController {
         console.log("userId", userId);
       }
     });
+
+	// Récupérer les infos voulu depuis les extra headers.
+			// socket.handshake.headers contient ce que vous voulez. 
+
+			/*
+				Dès qu'un socket utilisateur arrive, on veut l'ajouter à la room
+				pour chaque conversation dans laquelle il se trouve. 
+
+				ETAPE 1: 
+					Trouver toutes les conversations ou participe l'utilisateur. 
+
+				ETAPE 2:
+					Rejoindre chaque room ayant pour nom l'ID de la conversation. 
+
+				HINT:
+					socket.join(roomName: string) permet de rejoindre une room.
+					Le paramètre roomName doit absolument être de type string,
+					si vous mettez un type number, cela ne fonctionnera pas.
+			*/
   }
 
   // Cette fonction vous sert juste de debug.

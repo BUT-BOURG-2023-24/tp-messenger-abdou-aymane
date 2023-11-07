@@ -94,8 +94,8 @@ export async function getConversationById(req: Request, res: Response) {
 }
 
 export async function createConversation(req: Request, res: Response) {
-  const { participants } = req.body;
-  const result = await ConversationService.createConversation(participants);
+  const { concernedUsersIds } = req.body;
+  const result = await ConversationService.createConversation(concernedUsersIds);
   if (result.error) {
     return res.status(500).json(result);
   }

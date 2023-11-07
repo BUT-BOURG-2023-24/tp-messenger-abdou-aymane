@@ -9,33 +9,15 @@ const conversationController = require("../controllers/ConversationController");
 
 function checkAuth(req: Request, res: Response, next: NextFunction)
 {
-	const token = req.headers.authorization;
-	if(!token)
-	{
-		return res.status(401).json({error:'Need a token!'});
-	}
-	try
-	{
-		const decodedToken = jwt.verify(token, config.SECRET_KEY);
-		const userId = decodedToken.userId;
-		if (req.body && req.body.userId && req.body.userId !== userId) 
-		{
-			return res.status(401).json({error:'Invalid token!'});
-		} 
-	}
-	catch(error)
-	{
-		return res.status(401).json({error:'Expired token!'});
-	}
 	next();
 }
 
 //Dans le readme
 // Créer une nouvelle conversation
-conversations.post("/", checkAuth, conversationController.createConversation);
+conversations.post("", checkAuth, conversationController.createConversation);
 
 // Obtenir toutes les conversations
-conversations.post("/", checkAuth, conversationController.getAllConversations);
+conversations.post("", checkAuth, conversationController.getAllConversations);
 
 // Supprimer une conversation
 conversations.delete("/:id", checkAuth, conversationController.deleteConversation);

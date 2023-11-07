@@ -8,8 +8,6 @@ export default {
 	SECRET_KEY:  process.env.SECRET_KEY ?? "",
 	TOKEN_EXP:  process.env.TOKEN_EXP ?? "",
 	PORT: process.env.PORT ?? 5000,
-	SECRET_KEY: process.env.SECRET_KEY,
-	TOKEN_EXP: process.env.TOKEN_EXP,
 };
 
 /**

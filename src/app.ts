@@ -5,8 +5,8 @@ import { Database } from "./database/database";
 import { SocketController } from "./socket/socketController";
 import UserRouter from "./routers/UserRouter";
 import cors from "cors";
-import ConversationRouter from "./routers/ConversationRouter"
-import MessageRouter from "./routers/MessageRouter"
+import ConversationRouter from "./routers/ConversationRouter";
+import MessageRouter from "./routers/MessageRouter";
 
 const app = express();
 
@@ -23,15 +23,12 @@ function makeApp(database: Database, auth: any) {
     })
   );
 
-	const server = http.createServer(app);
-	app.use(express.json());
-	
-	app.use('/conversations', ConversationRouter);
-	app.use('/message', MessageRouter);
-
- 
+  app.use("/conversations", ConversationRouter);
+  app.use("/message", MessageRouter);
   app.use("/users", UserRouter);
 
+  const io = new Server(server, { cors: { origin: "*" } });
+  let socketController = new SocketController(io, database);
   app.locals.sockerController = socketController;
 
   return { app, server };
