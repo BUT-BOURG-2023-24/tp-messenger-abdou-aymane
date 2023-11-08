@@ -95,7 +95,11 @@ export async function getConversationById(req: Request, res: Response) {
 
 export async function createConversation(req: Request, res: Response) {
   const { concernedUsersIds } = req.body;
-  const result = await ConversationService.createConversation(concernedUsersIds);
+  const userId = getUserId(req);
+  const listeUsers : any[] = [];
+  listeUsers.push(concernedUsersIds[0]);
+  listeUsers.push(userId);
+  const result = await ConversationService.createConversation(listeUsers);
   if (result.error) {
     return res.status(500).json(result);
   }

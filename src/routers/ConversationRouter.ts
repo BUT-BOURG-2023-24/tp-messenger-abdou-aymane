@@ -7,11 +7,23 @@ const conversations = express.Router();
 const conversationController = require("../controllers/ConversationController");
 
 
-function checkAuth(req: Request, res: Response, next: NextFunction)
-{
+function checkAuth(req: Request, res: Response, next: NextFunction) {
+	const token = req.headers.authorization;
+	if (!token) {
+	  return res.status(401).json({ error: "Need a token!" });
+	}
+	try {
+	  const decodedToken = jwt.verify(token, config.SECRET_KEY);
+	  const userId = decodedToken.userId;
+	  if (req.body.userId && req.body.userId !== userId) {
+		return res.status(401).json({ error: "Invalid token!" });
+	  }
+	} catch (error) {
+		console.log( error);
+	  return res.status(401).json({ error: "Expired token!" });
+	}
 	next();
-}
-
+  }
 //Dans le readme
 // Créer une nouvelle conversation
 conversations.post("", checkAuth, conversationController.createConversation);
