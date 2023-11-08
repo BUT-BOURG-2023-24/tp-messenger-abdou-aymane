@@ -29,7 +29,7 @@ function checkAuth(req: Request, res: Response, next: NextFunction) {
 conversations.post("", checkAuth, conversationController.createConversation);
 
 // Obtenir toutes les conversations
-conversations.post("", checkAuth, conversationController.getAllConversations);
+conversations.get("", checkAuth, conversationController.getAllConversations);
 
 // Supprimer une conversation
 conversations.delete("/:id", checkAuth, conversationController.deleteConversation);

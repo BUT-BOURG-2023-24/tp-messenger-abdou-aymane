@@ -1,6 +1,7 @@
 import type { Database } from "../database/database";
 import { Server, Socket } from "socket.io";
-
+import type { IConversation } from "../database/Mongo/Models/ConversationModel";
+import ConversationModel from "../database/Mongo/Models/ConversationModel";
 export class SocketController {
   private socketIdToUserId: string[] = [];
 
@@ -10,36 +11,33 @@ export class SocketController {
   }
 
   public get SocketIdToUserId(): string[] {
-	return this.socketIdToUserId;
+    return this.socketIdToUserId;
   }
 
   connect() {
-    this.io.on("connection", (socket: Socket) => {
+    this.io.on("connection", async (socket: Socket) => {
       const userId = socket.handshake.headers.userid;
       if (typeof userId === "string") {
         this.socketIdToUserId.push(userId);
         console.log("userId", userId);
       }
+      const conversations = await findUserConversations(String(userId));
+      joinRooms(socket, conversations);
     });
 
-	// Récupérer les infos voulu depuis les extra headers.
-			// socket.handshake.headers contient ce que vous voulez. 
+    function joinRooms(socket: Socket, conversations: IConversation[]): void {
+      conversations.forEach(conversation => {
+        const roomName = String(conversation.id); 
+        socket.join(roomName);
+      });
+    }
+    // ETAPE 1:
+    // Trouver toutes les conversations ou participe l'utilisateur.
+    async function findUserConversations(userId: string): Promise<IConversation[]> {
+      const userConversations = await ConversationModel.find({ participants: { $in: [userId] } });
+      return userConversations;
+    }
 
-			/*
-				Dès qu'un socket utilisateur arrive, on veut l'ajouter à la room
-				pour chaque conversation dans laquelle il se trouve. 
-
-				ETAPE 1: 
-					Trouver toutes les conversations ou participe l'utilisateur. 
-
-				ETAPE 2:
-					Rejoindre chaque room ayant pour nom l'ID de la conversation. 
-
-				HINT:
-					socket.join(roomName: string) permet de rejoindre une room.
-					Le paramètre roomName doit absolument être de type string,
-					si vous mettez un type number, cela ne fonctionnera pas.
-			*/
   }
 
   // Cette fonction vous sert juste de debug.

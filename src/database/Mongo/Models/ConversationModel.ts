@@ -27,7 +27,7 @@ const conversationSchema: Schema<IConversation> = new Schema<IConversation>({
       },
     ],
     default: [],
-  },
+  },  
   title: {
     type: String,
     required: true,

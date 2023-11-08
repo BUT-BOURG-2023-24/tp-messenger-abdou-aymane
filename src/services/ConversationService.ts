@@ -2,14 +2,21 @@ const mongoose = require("mongoose");
 import { Request, Response } from 'express';
 import ConversationModel, { IConversation } from '../database/Mongo/Models/ConversationModel';
 import { IMessage } from '../database/Mongo/Models/MessageModel';
-
+import UserModel , {IUser} from '../database/Mongo/Models/UserModel';
 
 // Dans le readme
 async function createConversation(participants: string[]) {
   try {
+    let title ="Conversations entre ";
+    for (const user of participants) {
+        const userId: IUser | null = await UserModel.findById(user);
+        if (userId) {
+          title += userId.username + " ";
+        }
+    }
     const newConversation = new ConversationModel({
       participants,
-      title: participants.join(', '),
+      title: title,
     });
     const savedConversation = await newConversation.save();
     return { conversation: savedConversation };
@@ -18,9 +25,9 @@ async function createConversation(participants: string[]) {
   }
 }
 
-async function getAllConversations() {
+async function getAllConversations(id :string) {
   try {
-    const conversations = await ConversationModel.find();
+    const conversations = await ConversationModel.find({ participants: { $in: [id] } });
     return { conversations } || null;
   } catch ( error ){
     return { error };

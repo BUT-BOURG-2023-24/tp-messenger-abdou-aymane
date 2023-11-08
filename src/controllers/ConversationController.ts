@@ -1,6 +1,7 @@
 import { Request, Response}  from 'express';
 import * as ConversationService from '../services/ConversationService';
-import { IMessage } from '../database/Mongo/Models/MessageModel';
+import MessageModel, { IMessage } from '../database/Mongo/Models/MessageModel';
+import ConversationModel from '../database/Mongo/Models/ConversationModel';
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -23,8 +24,8 @@ export async function getConversationWithParticipants(req: Request, res: Respons
 }
 
 export async function getAllConversations(req: Request, res: Response){
-  
-  const result = await ConversationService.getAllConversations();
+  const userId = getUserId(req);
+  const result = await ConversationService.getAllConversations(userId);
   if(result.error){
     return res.status(500).json(result);
   }
@@ -53,27 +54,43 @@ export async function markMessageAsSeen(req: Request, res: Response) {
   }
 }
 
+
 export async function addMessageToConversation(req: Request, res: Response) {
   const { id } = req.params;
-  const { content, messageReplyId } = req.body;
-  
+  const { messageContent, messageReplyId } = req.body;
+
   const userId = getUserId(req);
-  const newMessage = {
-    conversationId: id, 
-    from: userId, 
-    content: content, 
-    postedAt: new Date(), 
-    replyTo: messageReplyId || null, 
-    edited: false,
-    deleted: false,
-    reactions: {}, 
-  } as IMessage;
-  const result = await ConversationService.addMessageToConversation(id, newMessage);
-  if (result.error) {
-    return res.status(500).json(result);
+
+  try {
+    const conversation = await ConversationModel.findById(id);
+    
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
+
+    const newMessage = await MessageModel.create({
+      conversationId: id,
+      from: userId,
+      content: messageContent,
+      postedAt: new Date(),
+      replyTo: messageReplyId || null,
+      edited: false,
+      deleted: false,
+      reactions: {},
+    });
+
+    conversation.messages.push(newMessage._id);
+    conversation.lastUpdate = newMessage.postedAt;
+    
+    await conversation.save();
+
+    return res.status(201).json({ message: newMessage });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
-  return res.json(result);
 }
+
 
 export async function getAllConversationsForUser(req: Request, res: Response) {
   const { userId } = req.params;
@@ -96,10 +113,8 @@ export async function getConversationById(req: Request, res: Response) {
 export async function createConversation(req: Request, res: Response) {
   const { concernedUsersIds } = req.body;
   const userId = getUserId(req);
-  const listeUsers : any[] = [];
-  listeUsers.push(concernedUsersIds[0]);
-  listeUsers.push(userId);
-  const result = await ConversationService.createConversation(listeUsers);
+  concernedUsersIds.push(userId);
+  const result = await ConversationService.createConversation(concernedUsersIds);
   if (result.error) {
     return res.status(500).json(result);
   }
