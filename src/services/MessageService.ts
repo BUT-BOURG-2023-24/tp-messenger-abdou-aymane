@@ -47,9 +47,9 @@ async function reactToMessage(id: string, userId: string, reaction: string) {
     }
 }
 
-async function getMessageById(id: string) {
+async function getMessageById(conversationId: string) {
   try {
-    const message = await MessageModel.findById(id);
+    const message = await MessageModel.find({ conversationId }).exec();;
     return message ? { message } : { error: 'Message not found' };
   } catch (error) {
     return { error };

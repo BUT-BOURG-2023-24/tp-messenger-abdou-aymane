@@ -12,7 +12,6 @@ import {
 
 async function loginController(req: Request, res: Response) {
   const { username, password } = req.body; // Use req.body for POST requests
-
   try {
     let existingUser: IUser | null = await getUserByName(username);
     if (existingUser) {

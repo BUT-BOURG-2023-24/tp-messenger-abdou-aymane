@@ -70,9 +70,9 @@ export async function reactToMessage(req: Request, res: Response) {
 }
 
 export async function getMessageById(req: Request, res: Response) {
-  const { id } = req.params;
+  const { conversationId } = req.params;
 
-  const result = await MessageService.getMessageById(id);
+  const result = await MessageService.getMessageById(conversationId);
   if (result.error) {
     return res.status(500).json(result);
   }

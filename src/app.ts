@@ -10,16 +10,15 @@ import MessageRouter from "./routers/MessageRouter";
 
 const app = express();
 
-function makeApp(database: Database, auth: any) {
+function makeApp(database: Database) {
   app.locals.database = database;
   database.connect();
-  app.locals.auth = auth;
   const server = http.createServer(app);
   app.use(express.json());
   app.use(
     cors({
       credentials: true,
-      origin: "http://localhost:3000",
+      origin: "*",
     })
   );
 

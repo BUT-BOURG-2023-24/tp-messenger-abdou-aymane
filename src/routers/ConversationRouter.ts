@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction}  from 'express';
 const jwt = require('jsonwebtoken');
 import config from '../config'
-
+import joiValidator from '../middleware/joiValidator';
 const express = require("express");
 const conversations = express.Router();
 const conversationController = require("../controllers/ConversationController");
 
 
 function checkAuth(req: Request, res: Response, next: NextFunction) {
+	joiValidator(req,res,next);
 	const token = req.headers.authorization;
 	if (!token) {
 	  return res.status(401).json({ error: "Need a token!" });
