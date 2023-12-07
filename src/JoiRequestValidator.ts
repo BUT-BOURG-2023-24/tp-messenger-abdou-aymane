@@ -1,57 +1,67 @@
 import * as joi from "joi";
-import { Request } from "express";
+import {Request} from "express";
+import {userLoginSchema} from "./joi-schema/userLoginSchema";
+import {createConversationSchema} from "./joi-schema/createConversationSchema";
+import {addMessageConversationSchema} from "./joi-schema/addMessageConversationSchema";
+import {seeMessageConversationSchema} from "./joi-schema/seeMessageConversationSchema";
+import {reactionMessageSchema} from "./joi-schema/reactionMessageSchema";
+import {editMessageSchema} from "./joi-schema/editMessageSchema";
 
-interface JoiRequestValidatorResponse
-{
-	error?: string
+interface JoiRequestValidatorResponse {
+    error?: string
 }
 
-interface JoiRouteValidator
-{
-	route: string,
-	method: string,
-	validatorSchema: joi.ObjectSchema<any>
+interface JoiRouteValidator {
+    route: string,
+    method: string,
+    validatorSchema: joi.ObjectSchema<any>
 }
 
-class JoiRequestValidator 
-{
-	validators: JoiRouteValidator[] = 
-	[
-		// EXEMPLE
-		// {
-		// 	route: "/conversations/:id",
-		// 	method: "POST",
-		// 	validatorSchema: bodyFormat,
-		// }
-	];
+class JoiRequestValidator {
+    validators: JoiRouteValidator[] =
+        [
+            {
+                route: "users/login",
+                method: "POST",
+                validatorSchema: userLoginSchema,
+            }, {
+                route: "conversations/",
+                method: "POST",
+                validatorSchema: createConversationSchema
+            }, {
+                route: "conversations/:id",
+                method: "POST",
+                validatorSchema: addMessageConversationSchema
+            }, {
+                route: "conversations/see/:id",
+                method: "POST",
+                validatorSchema: seeMessageConversationSchema
+            },{
+                route: "messages/:id",
+                method: "PUT",
+                validatorSchema: editMessageSchema
+            },{
+                route: "messages/:id",
+                method: "POST",
+                validatorSchema: reactionMessageSchema
+        }
+        ];
 
-	validate(request: Request): JoiRequestValidatorResponse 
-	{
-		// request.baseUrl contient l'URL de base, avant application des middlewares.
-		// request.route.path contient l'URL que vous déclarez dans votre middleware de routage.
-		console.log(request.baseUrl);
-		console.log(request.route.path);
+    validate(request: Request): JoiRequestValidatorResponse {
 
-		/* 
-			ETAPE 1:
 
-			Trouver dans la liste de validators, le validator qui correspond à la route de la requête.
-		*/
-
-		/* 
-			ETAPE 2:
-
-			Si le validator n'existe pas
-				=> retourner un objet vide.
-			Si le validator existe 
-				=> valider le body de la requête.
-				=> Si le body est valide
-					=> retourner un objet vide.
-				=> Si le body est invalide
-					=> retourner un objet avec une clé error contenant les details de l'erreur.
-		*/
-		return {};
-	}
+        const validator = this.validators.find((validator) => {
+            return validator.route ===  (request.baseUrl + request.route.path).substring(1) && validator.method === request.method;
+        });
+        if (!validator) {
+            return {};
+        }
+        const {error} = validator.validatorSchema.validate(request.body);
+        if (error) {
+            return {error: error.details[0].message};
+        }
+        return {};
+    }
 }
 
 export const JoiRequestValidatorInstance = new JoiRequestValidator();

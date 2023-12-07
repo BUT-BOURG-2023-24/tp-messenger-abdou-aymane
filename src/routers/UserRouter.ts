@@ -6,7 +6,9 @@ const {
     allController
 } = require("../controllers/UserController");
 
-UserRouter.post("/login", loginController);
+import JoiValidator from "../middleware/joiValidator";
+
+UserRouter.post("/login", JoiValidator, loginController);
 UserRouter.get("/online", onlineController);
 UserRouter.get("/all", allController);
 

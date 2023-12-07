@@ -95,7 +95,7 @@ export async function addMessageToConversation(req: Request, res: Response) {
 export async function getAllConversationsForUser(req: Request, res: Response) {
   const { userId } = req.params;
   const result = await ConversationService.getAllConversationsForUser(userId);
-  if (result.error) {
+  if ('error' in result) {
     return res.status(500).json(result);
   }
   return res.json(result);

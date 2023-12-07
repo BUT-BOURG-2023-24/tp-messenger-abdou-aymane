@@ -11,12 +11,11 @@ import {
 } from "../services/UserService";
 
 async function loginController(req: Request, res: Response) {
-  const { username, password } = req.body; // Use req.body for POST requests
+  const { username, password } = req.body; 
   try {
     let existingUser: IUser | null = await getUserByName(username);
     if (existingUser) {
       if (existingUser.password === password) {
-        // Successful login
         const token = jwt.sign(
           { userId: existingUser._id },
           config.SECRET_KEY,
@@ -57,7 +56,7 @@ async function loginController(req: Request, res: Response) {
 
 async function onlineController(req: Request, res: Response) {
   try {
-    const UsersOnline = req.app.locals.sockerController.SocketIdToUserId;
+   const UsersOnline : string[] = Array.from(req.app.locals.socketController.socketIdToUserId.values());
     const users = await getUsersByIds(UsersOnline);
     return res.status(200).json({ users });
   } catch (error) {

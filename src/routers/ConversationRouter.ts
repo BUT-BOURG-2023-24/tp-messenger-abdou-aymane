@@ -1,36 +1,18 @@
 import { Request, Response, NextFunction}  from 'express';
 const jwt = require('jsonwebtoken');
 import config from '../config'
-import joiValidator from '../middleware/joiValidator';
+import {checkAuth} from "../middleware/auth";
+import JoiValidator from "../middleware/joiValidator";
 const express = require("express");
 const conversations = express.Router();
 const conversationController = require("../controllers/ConversationController");
 
 
-function checkAuth(req: Request, res: Response, next: NextFunction) {
-	joiValidator(req,res,next);
-	const token = req.headers.authorization;
-	if (!token) {
-	  return res.status(401).json({ error: "Need a token!" });
-	}
-	try {
-	  const decodedToken = jwt.verify(token, config.SECRET_KEY);
-	  const userId = decodedToken.userId;
-	  if (req.body.userId && req.body.userId !== userId) {
-		return res.status(401).json({ error: "Invalid token!" });
-	  }
-	} catch (error) {
-		console.log( error);
-	  return res.status(401).json({ error: "Expired token!" });
-	}
-	next();
-  }
-//Dans le readme
 // Créer une nouvelle conversation
-conversations.post("", checkAuth, conversationController.createConversation);
+conversations.post("/", JoiValidator, checkAuth, conversationController.createConversation);
 
 // Obtenir toutes les conversations
-conversations.get("", checkAuth, conversationController.getAllConversations);
+conversations.get("/", checkAuth, conversationController.getAllConversations);
 
 // Supprimer une conversation
 conversations.delete("/:id", checkAuth, conversationController.deleteConversation);

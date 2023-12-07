@@ -1,18 +1,20 @@
 const mongoose = require("mongoose");
-import { Request, Response } from 'express';
-import ConversationModel, { IConversation } from '../database/Mongo/Models/ConversationModel';
-import { IMessage } from '../database/Mongo/Models/MessageModel';
-import UserModel , {IUser} from '../database/Mongo/Models/UserModel';
+import { Request, Response } from "express";
+import ConversationModel, {
+  IConversation,
+} from "../database/Mongo/Models/ConversationModel";
+import { IMessage } from "../database/Mongo/Models/MessageModel";
+import UserModel, { IUser } from "../database/Mongo/Models/UserModel";
 
 // Dans le readme
 async function createConversation(participants: string[]) {
   try {
-    let title ="Conversations entre ";
+    let title = "Conversations entre ";
     for (const user of participants) {
-        const userId: IUser | null = await UserModel.findById(user);
-        if (userId) {
-          title += userId.username + " ";
-        }
+      const userId: IUser | null = await UserModel.findById(user);
+      if (userId) {
+        title += userId.username + " ";
+      }
     }
     const newConversation = new ConversationModel({
       participants,
@@ -25,11 +27,13 @@ async function createConversation(participants: string[]) {
   }
 }
 
-async function getAllConversations(id :string) {
+async function getAllConversations(id: string) {
   try {
-    const conversations = await ConversationModel.find({ participants: { $in: [id] } });
+    const conversations = await ConversationModel.find({
+      participants: { $in: [id] },
+    });
     return { conversations } || null;
-  } catch ( error ){
+  } catch (error) {
     return { error };
   }
 }
@@ -43,7 +47,11 @@ async function deleteConversation(id: string) {
   }
 }
 
-async function markMessageAsSeen(conversationId: string, userId: string, messageId: string) {
+async function markMessageAsSeen(
+  conversationId: string,
+  userId: string,
+  messageId: string
+) {
   try {
     const updatedConversation = await ConversationModel.findByIdAndUpdate(
       conversationId,
@@ -82,17 +90,21 @@ async function addMessageToConversation(id: string, message: IMessage) {
 // Pas dans le readme
 async function getConversationWithParticipants(participantIds: string) {
   try {
-    const conversation = await ConversationModel.findOne({ participants: participantIds });
+    const conversation = await ConversationModel.findOne({
+      participants: participantIds,
+    });
     return { conversation };
   } catch (error) {
     return { error };
   }
 }
 
-async function getAllConversationsForUser(userId: string) {
+async function getAllConversationsForUser(userId: string){
   try {
-    const conversations = await ConversationModel.find({ participants: userId });
-    return { conversations };
+   const conversations = await ConversationModel.find({ participants: userId })
+      .populate({ path: "participants" })
+      .populate({ path: "messages" }).exec();
+      return conversations ?? [];
   } catch (error) {
     return { error };
   }
@@ -107,7 +119,11 @@ async function getConversationById(id: string) {
   }
 }
 
-async function setConversationSeenForUserAndMessage(id: string, userId: string, messageId: string) {
+async function setConversationSeenForUserAndMessage(
+  id: string,
+  userId: string,
+  messageId: string
+) {
   try {
     const conversation = await ConversationModel.findById(id);
     if (!conversation) {
@@ -121,7 +137,6 @@ async function setConversationSeenForUserAndMessage(id: string, userId: string, 
   }
 }
 
-
 export {
   getConversationWithParticipants,
   getAllConversationsForUser,
@@ -133,5 +148,3 @@ export {
   getAllConversations,
   markMessageAsSeen,
 };
-
-

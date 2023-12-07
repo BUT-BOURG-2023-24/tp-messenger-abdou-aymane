@@ -1,7 +1,8 @@
+
 import * as http from "http";
 import express from "express";
 import { Server } from "socket.io";
-import { Database } from "./database/database";
+import type { Database } from "./database/database"; 
 import { SocketController } from "./socket/socketController";
 import UserRouter from "./routers/UserRouter";
 import cors from "cors";

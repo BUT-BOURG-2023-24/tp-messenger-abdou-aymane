@@ -2,34 +2,16 @@ import { Router, Request, Response, NextFunction } from 'express';
 import * as messageController from '../controllers/MessageController';
 const jwt = require('jsonwebtoken');
 import config from '../config'
-import joiValidator from '../middleware/joiValidator';
+import {checkAuth} from "../middleware/auth";
+import JoiValidator from "../middleware/joiValidator";
 
 const message = Router();
 
-function checkAuth(req: Request, res: Response, next: NextFunction) {
-	joiValidator(req,res,next);
-	const token = req.headers.authorization;
-	if (!token) {
-	  return res.status(401).json({ error: "Need a token!" });
-	}
-	try {
-	  const decodedToken = jwt.verify(token, config.SECRET_KEY);
-	  const userId = decodedToken.userId;
-	  if (req.body.userId && req.body.userId !== userId) {
-		return res.status(401).json({ error: "Invalid token!" });
-	  }
-	} catch (error) {
-		console.log( error);
-	  return res.status(401).json({ error: "Expired token!" });
-	}
-	next();
-  }
-
 // Éditer un message existant
-message.put('/:id', checkAuth, messageController.editMessage);
+message.put('/:id', JoiValidator, checkAuth, messageController.editMessage);
 
 // Réagir à un message
-message.post('/:id', checkAuth, messageController.reactToMessage);
+message.post('/:id', JoiValidator, checkAuth, messageController.reactToMessage);
 
 // Créer un nouveau message dans une conversation
 message.post('/:conversationId/message', checkAuth, messageController.createMessage);
