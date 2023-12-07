@@ -2,15 +2,6 @@ import http from "http";
 import { Express } from "express";
 import { setup, teardown } from "./setupTests";
 import supertest from "supertest";
-import {
-  createConversation,
-  getAllConversations,
-  deleteConversation,
-  addMessageToConversation,
-  markMessageAsSeen,
-} from "../services/ConversationService";
-
-import { reactToMessage } from "../services/MessageService";
 
 describe("CONVERSATIONS", () => {
   let app: Express, server: http.Server;
@@ -43,7 +34,7 @@ describe("CONVERSATIONS", () => {
     const response = await supertest(app)
       .post("/create-conversation")
       .send({ participants: wrongParticipants })
-      .expect(400); // Adjust the expected status code based on your application logic
+      .expect(400); 
 
     expect(response.body.error).toBeDefined();
   });

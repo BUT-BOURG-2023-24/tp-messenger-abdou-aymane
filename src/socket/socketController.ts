@@ -2,8 +2,9 @@ import type { Database } from "../database/database";
 import { Server, Socket } from "socket.io";
 import type { IConversation } from "../database/Mongo/Models/ConversationModel";
 import ConversationModel from "../database/Mongo/Models/ConversationModel";
+
 export class SocketController {
-  private socketIdToUserId: string[] = [];
+  private socketIdToUserId: Record<string, string> = {};
 
   constructor(private io: Server, private database: Database) {
     this.connect();
@@ -11,52 +12,65 @@ export class SocketController {
   }
 
   public get SocketIdToUserId(): string[] {
-    return this.socketIdToUserId;
+    return Object.values(this.socketIdToUserId);
   }
 
   connect() {
     this.io.on("connection", async (socket: Socket) => {
       const userId = socket.handshake.headers.userid;
       if (typeof userId === "string") {
-        this.socketIdToUserId.push(userId);
+        this.socketIdToUserId[socket.id] = userId;
         console.log("userId", userId);
       }
       const conversations = await findUserConversations(String(userId));
       joinRooms(socket, conversations);
+
+      // Handle disconnect event
+      socket.on("disconnect", () => {
+        if (this.socketIdToUserId[socket.id]) {
+          const disconnectedUserId = this.socketIdToUserId[socket.id];
+          delete this.socketIdToUserId[socket.id];
+          console.log(`User ${disconnectedUserId} disconnected`);
+        }
+      });
     });
 
     function joinRooms(socket: Socket, conversations: IConversation[]): void {
-      conversations.forEach(conversation => {
-        const roomName = String(conversation.id); 
+      conversations.forEach((conversation) => {
+        const roomName = String(conversation.id);
         socket.join(roomName);
       });
     }
-    // ETAPE 1:
-    // Trouver toutes les conversations ou participe l'utilisateur.
+
     async function findUserConversations(userId: string): Promise<IConversation[]> {
-      const userConversations = await ConversationModel.find({ participants: { $in: [userId] } });
+      const userConversations = await ConversationModel.find({
+        participants: { $in: [userId] },
+      });
       return userConversations;
     }
-
   }
 
-  // Cette fonction vous sert juste de debug.
-  // Elle permet de log l'informations pour chaque changement d'une room.
+  // This function is just for debugging.
+  // It logs information for each room change.
   listenRoomChanged() {
+    const handleRoomChange = (event: string, room: string, id: string) => {
+      console.log(`Socket ${id} ${event} room ${room}`);
+    };
+
     this.io.of("/").adapter.on("create-room", (room) => {
-      console.log(`room ${room} was created`);
+      handleRoomChange("created", room, "");
     });
 
     this.io.of("/").adapter.on("join-room", (room, id) => {
-      console.log(`socket ${id} has joined room ${room}`);
+      handleRoomChange("joined", room, id);
     });
 
     this.io.of("/").adapter.on("leave-room", (room, id) => {
-      console.log(`socket ${id} has leave room ${room}`);
+      handleRoomChange("left", room, id);
     });
 
     this.io.of("/").adapter.on("delete-room", (room) => {
-      console.log(`room ${room} was deleted`);
+      handleRoomChange("deleted", room, "");
     });
   }
 }

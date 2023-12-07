@@ -40,7 +40,7 @@ async function setup(): Promise<SetupResult>
 
 	let res = await supertest(app)
 		.post("/users/login")
-		.send({ username: "test", password: "testpwd" });
+		.send({ username: "testssssssss", password: "testpwdsss" });
 
 	/*
 		Pour se faciliter la tâche, nous allons également connecter directement
