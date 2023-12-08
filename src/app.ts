@@ -24,7 +24,7 @@ function makeApp(database: Database) {
   );
 
   app.use("/conversations", ConversationRouter);
-  app.use("/message", MessageRouter);
+  app.use("/messages", MessageRouter);
   app.use("/users", UserRouter);
 
   const io = new Server(server, { cors: { origin: "*" } });

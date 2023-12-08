@@ -2,7 +2,6 @@ import type { Database } from "../database/database";
 import { Server, Socket } from "socket.io";
 import type { IConversation } from "../database/Mongo/Models/ConversationModel";
 import {IMessage} from "../database/Mongo/Models/MessageModel";
-import ConversationModel from "../database/Mongo/Models/ConversationModel";
 import {getAllConversationsForUser} from "../services/ConversationService"
 export class SocketController {
   public socketIdToUserId: Map<string, string> = new Map<string, string>();
