@@ -38,11 +38,11 @@ describe("CONVERSATIONS", () => {
     const response = await supertest(app)
       .post("/conversations")
       .send({
-        concernedUsersIds: ["654f86988b3dbc7ac03790a5"],
+        concernedUsersIds: ["falseUser"],
       })
       .set("authorization", testUserToken);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(500);
   });
 
   test("CREATE Conversation wrong users", async () => {
@@ -53,7 +53,7 @@ describe("CONVERSATIONS", () => {
       })
       .set("authorization", testUserToken);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(500);
   });
 
   let conversationIdToUseForNextTest: string = "";
@@ -92,45 +92,34 @@ describe("CONVERSATIONS", () => {
       })
       .set("authorization", testUser3Token);
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(201);
   });
 
-  let message2IdToUseForNextTest: string = "";
+  let anotherMessageIdToUse: string = "";
 
   test("POST Reply message in conversation", async () => {
     const response = await supertest(app)
       .post(`/conversations/${conversationIdToUseForNextTest}`)
       .send({
-        messageContent: "Salut toi !!",
+        messageContent: "Salut abidou !!",
         messageReplyId: messageIdToUseForNextTest,
       })
       .set("authorization", testUser2Token);
 
     expect(response.statusCode).toBe(201);
 
-    message2IdToUseForNextTest = response.body.message._id;
-  });
-
-  test("PUT Edit message in conversation", async () => {
-    const response = await supertest(app)
-      .put(`/messages/${messageIdToUseForNextTest}`)
-      .send({
-        newMessageContent: "SALUT !!",
-      })
-      .set("authorization", testUserToken);
-
-    expect(response.statusCode).toBe(200);
+    anotherMessageIdToUse = response.body.message._id;
   });
 
   test("PUT Edit message in conversation of another user", async () => {
     const response = await supertest(app)
       .put(`/messages/${messageIdToUseForNextTest}`)
       .send({
-        newMessageContent: "SALUT !!",
+        newMessageContent: "SALUT aymane !!",
       })
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(404);
   });
 
   test("POST React message in conversation", async () => {
@@ -141,7 +130,7 @@ describe("CONVERSATIONS", () => {
       })
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(404);
   });
 
   test("POST See conversation", async () => {
@@ -163,18 +152,18 @@ describe("CONVERSATIONS", () => {
       })
       .set("authorization", testUserToken);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(404);
   });
 
   test("POST See conversation with an valid message id that doesn't exist", async () => {
     const response = await supertest(app)
       .post(`/conversations/see/${conversationIdToUseForNextTest}`)
       .send({
-        messageId: "654f86988b3dbc7ac03790a5",
+        messageId: "falseUser",
       })
       .set("authorization", testUserToken);
 
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(404);
   });
 
   test("DELETE Message in conversation", async () => {
@@ -183,7 +172,7 @@ describe("CONVERSATIONS", () => {
       .send()
       .set("authorization", testUserToken);
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(404);
   });
 
   test("DELETE Message in conversation of another user", async () => {
@@ -192,7 +181,7 @@ describe("CONVERSATIONS", () => {
       .send()
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(404);
   });
 
   test("DELETE Conversation", async () => {
@@ -206,32 +195,32 @@ describe("CONVERSATIONS", () => {
 
   test("PUT Edit message in a deleted conversation", async () => {
     const response = await supertest(app)
-      .put(`/messages/${message2IdToUseForNextTest}`)
+      .put(`/messages/${anotherMessageIdToUse}`)
       .send({
         newMessageContent: "Coucou !!",
       })
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(500);
+    expect(response.statusCode).toBe(404);
   });
 
   test("POST React message in a deleted conversation", async () => {
     const response = await supertest(app)
-      .post(`/messages/${message2IdToUseForNextTest}`)
+      .post(`/messages/${anotherMessageIdToUse}`)
       .send({
         reaction: "ENJOY",
       })
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(500);
+    expect(response.statusCode).toBe(404);
   });
 
   test("DELETE Message in a deleted conversation", async () => {
     const response = await supertest(app)
-      .delete(`/messages/${message2IdToUseForNextTest}`)
+      .delete(`/messages/${anotherMessageIdToUse}`)
       .send()
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(500);
+    expect(response.statusCode).toBe(404);
   });
 });

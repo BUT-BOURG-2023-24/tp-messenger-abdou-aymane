@@ -17,7 +17,7 @@ describe("USERS", () => {
   test("Login unexisting user", async () => {
     const response = await supertest(app).post("/users/login").send({
       username: "testexistpas",
-      password: "hehe45",
+      password: "testtest30",
     });
 
     expect(response.statusCode).toBe(201);
