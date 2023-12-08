@@ -6,12 +6,12 @@ import config from "../config";
 import {
   createUser,
   getUserByName,
-  getUsersByIds,
+  getUsersbyIds,
   getAllUsers,
 } from "../services/UserService";
 
 async function loginController(req: Request, res: Response) {
-  const { username, password } = req.body; 
+  const { username, password } = req.body;
   try {
     let existingUser: IUser | null = await getUserByName(username);
     if (existingUser) {
@@ -45,7 +45,7 @@ async function loginController(req: Request, res: Response) {
         const token = jwt.sign({ userId: user._id }, config.SECRET_KEY, {
           expiresIn: config.TOKEN_EXP,
         });
-        res.status(201).json({ user: user, token: token, isNewUser: false });
+        res.status(201).json({ user: user, token: token, isNewUser: true });
       }
     }
   } catch (error) {
@@ -56,9 +56,9 @@ async function loginController(req: Request, res: Response) {
 
 async function onlineController(req: Request, res: Response) {
   try {
-   const UsersOnline : string[] = Array.from(req.app.locals.socketController.socketIdToUserId.values());
-    const users = await getUsersByIds(UsersOnline);
-    return res.status(200).json({ users });
+    const usersId: string[] = Array.from(req.app.locals.sockerController.socketIdToUserId.values());
+    const onlineUsers = await getUsersbyIds(usersId);
+    return res.status(200).json(onlineUsers);
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -67,7 +67,7 @@ async function onlineController(req: Request, res: Response) {
 async function allController(req: Request, res: Response) {
   try {
     const users = await getAllUsers();
-    return res.status(200).json({ users });
+    return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

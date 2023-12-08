@@ -7,7 +7,6 @@ describe("USERS", () => {
 
   beforeAll(async () => {
     const setupResult = await setup();
-
     app = setupResult.app;
   });
 
@@ -17,11 +16,11 @@ describe("USERS", () => {
 
   test("Login unexisting user", async () => {
     const response = await supertest(app).post("/users/login").send({
-      username: "testexist",
+      username: "testexistpas",
       password: "hehe45",
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(201);
     expect(response.body.isNewUser).toBeTruthy();
   });
 
@@ -38,7 +37,7 @@ describe("USERS", () => {
   test("Login wrong password", async () => {
     const response = await supertest(app).post("/users/login").send({
       username: "test2",
-      password: "mauvaismdp",
+      password: "wrongmdp",
     });
 
     expect(response.statusCode).toBe(400);
@@ -52,7 +51,6 @@ describe("USERS", () => {
 
   test("GET all users", async () => {
     const response = await supertest(app).get("/users/all").send();
-
     expect(response.statusCode).toBe(200);
     expect(response.body.users).toHaveLength(4);
   });

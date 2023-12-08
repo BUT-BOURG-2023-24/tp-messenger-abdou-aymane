@@ -32,10 +32,10 @@ async function getUserById(id: string) {
   }
 }
 
-async function getUsersByIds(ids: string[]) {
+async function getUsersbyIds(listeIds: string[]) {
   try {
-    const users = await UserModel.find({ _id: { $in: ids } });
-    return users;
+    const users = await UserModel.find({ _id: { $in: listeIds } });
+    return { users };
   } catch (error) {
     return { error };
   }
@@ -44,10 +44,10 @@ async function getUsersByIds(ids: string[]) {
 async function getAllUsers() {
   try {
     const users = await UserModel.find();
-    return users;
+    return { users };
   } catch (error) {
-    return null ;
+    return { error };
   }
 }
 
-export { createUser, getUserByName, getUserById, getUsersByIds, getAllUsers };
+export { createUser, getUserByName, getUserById, getUsersbyIds, getAllUsers };

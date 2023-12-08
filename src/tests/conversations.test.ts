@@ -12,7 +12,6 @@ describe("CONVERSATIONS", () => {
 
   beforeAll(async () => {
     const setupResult = await setup();
-
     app = setupResult.app;
     testUserToken = setupResult.testUserToken;
     testUser2Token = setupResult.testUser2Token;
@@ -80,7 +79,7 @@ describe("CONVERSATIONS", () => {
       })
       .set("authorization", testUserToken);
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(201);
 
     messageIdToUseForNextTest = response.body.message._id;
   });
@@ -107,7 +106,7 @@ describe("CONVERSATIONS", () => {
       })
       .set("authorization", testUser2Token);
 
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(201);
 
     message2IdToUseForNextTest = response.body.message._id;
   });
@@ -116,7 +115,7 @@ describe("CONVERSATIONS", () => {
     const response = await supertest(app)
       .put(`/messages/${messageIdToUseForNextTest}`)
       .send({
-        newMessageContent: "Yoo !!",
+        newMessageContent: "SALUT !!",
       })
       .set("authorization", testUserToken);
 
@@ -127,7 +126,7 @@ describe("CONVERSATIONS", () => {
     const response = await supertest(app)
       .put(`/messages/${messageIdToUseForNextTest}`)
       .send({
-        newMessageContent: "Yoo !!",
+        newMessageContent: "SALUT !!",
       })
       .set("authorization", testUser2Token);
 
@@ -138,7 +137,7 @@ describe("CONVERSATIONS", () => {
     const response = await supertest(app)
       .post(`/messages/${messageIdToUseForNextTest}`)
       .send({
-        reaction: "HAPPY",
+        reaction: "ENJOY",
       })
       .set("authorization", testUser2Token);
 
@@ -220,7 +219,7 @@ describe("CONVERSATIONS", () => {
     const response = await supertest(app)
       .post(`/messages/${message2IdToUseForNextTest}`)
       .send({
-        reaction: "HAPPY",
+        reaction: "ENJOY",
       })
       .set("authorization", testUser2Token);
 

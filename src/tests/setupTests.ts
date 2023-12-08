@@ -23,7 +23,12 @@ async function setup(): Promise<SetupResult> {
 
   await database.connect();
 
-  const collections = await mongoose.connection.db.collections();
+  const connection = mongoose.connection;
+  if (connection.readyState !== 1) {
+    throw new Error("MongoDB connection is not ready.");
+  }
+
+  const collections = await connection.db.collections();
 
   for (const collection of collections) {
     await collection.deleteMany({});
