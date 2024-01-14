@@ -21,6 +21,6 @@ message.delete('/:id', checkAuth, messageController.deleteMessage);
 
 
 // Obtenir un message par son ID
-message.get('/:id', checkAuth, messageController.getMessageById);
+message.get('/:conversationId', checkAuth, messageController.getMessageById);
 
 export default message;

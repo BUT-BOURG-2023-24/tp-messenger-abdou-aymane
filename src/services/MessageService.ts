@@ -1,9 +1,19 @@
+import ConversationModel from '../database/Mongo/Models/ConversationModel';
 import MessageModel, { IMessage } from '../database/Mongo/Models/MessageModel';
 
 async function createMessage(message: IMessage) {
   try {
     const newMessage = new MessageModel(message);
     const savedMessage = await newMessage.save();
+    
+    // Find the conversation and add the new message's ID to it
+    const conversation = await ConversationModel.findById(newMessage.conversationId);
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+    conversation.messages.push(savedMessage._id);
+    await conversation.save();
+    
     return { message: savedMessage };
   } catch (error) {
     return { error };
@@ -49,7 +59,7 @@ async function reactToMessage(id: string, userId: string, reaction: string) {
 
 async function getMessageById(conversationId: string) {
   try {
-    const message = await MessageModel.find({ conversationId }).exec();;
+    const message = await MessageModel.find({ conversationId: conversationId }).exec();;
     return message ? { message } : { error: 'Message not found' };
   } catch (error) {
     return { error };

@@ -19,7 +19,7 @@ export async function createMessage(req: Request, res: Response) {
   const userId = getUserId(req);
 
   const newMessage = {
-    conversationId: req.params.id,
+    conversationId: req.params.conversationId,
     from: userId,
     content,
     postedAt: new Date(),
@@ -33,6 +33,7 @@ export async function createMessage(req: Request, res: Response) {
   if (result.error) {
     return res.status(500).json(result);
   }
+
   return res.json(result);
 }
 
@@ -70,8 +71,8 @@ export async function reactToMessage(req: Request, res: Response) {
 }
 
 export async function getMessageById(req: Request, res: Response) {
-  const { conversationId } = req.params;
-
+  const conversationId  = req.params.conversationId;
+  console.log(conversationId);
   const result = await MessageService.getMessageById(conversationId);
   if (result.error) {
     return res.status(500).json(result);
